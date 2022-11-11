@@ -44,7 +44,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
           ...cart,
           newProduct
         ]);
-      })
+      });
     } catch (error) {
       return console.error(error);
     }
@@ -63,9 +63,20 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     amount,
   }: UpdateProductAmount) => {
     try {
-      // TODO
-    } catch {
-      // TODO
+      const newCart = cart.map((product) => {
+        if(product.id === productId) {
+          const productUpdated = Object.assign({}, product);
+          productUpdated.amount += amount;
+          
+          return productUpdated;
+        } else {
+          return product
+        }
+      });
+
+      setCart(newCart);
+    } catch (error){
+      return console.error(error);
     }
   };
 
