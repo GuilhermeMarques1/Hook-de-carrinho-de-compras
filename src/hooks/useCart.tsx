@@ -52,9 +52,9 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const removeProduct = (productId: number) => {
     try {
-      // TODO
-    } catch {
-      // TODO
+      
+    } catch (error) {
+      return console.error(error);
     }
   };
 
