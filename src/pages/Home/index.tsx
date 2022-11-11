@@ -23,7 +23,7 @@ interface CartItemsAmount {
 
 const Home = (): JSX.Element => {
   const [products, setProducts] = useState<ProductFormatted[]>([]);
-  const { addProduct, updateProductAmount, cart } = useCart();
+  const { addProduct, cart } = useCart();
 
   const sumAmountInit: CartItemsAmount = {};
   products.forEach((product) => {
@@ -46,11 +46,7 @@ const Home = (): JSX.Element => {
   }, []);
 
   async function handleAddProduct(id: number) {
-    if(cart.find((product) => product.id === id)) {
-      updateProductAmount({productId: id, amount: 1});
-    } else {
-      addProduct(id);
-    }
+    await addProduct(id);
   }
 
   return (
