@@ -36,7 +36,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     try {
       const stockOfProduct: Stock = 
         await api.get(`/stock/${productId}`).then((stockDataOfProduct) => stockDataOfProduct.data);
-      
+
       if(stockOfProduct.amount === 0) {
         toast.error('Quantidade solicitada fora de estoque');
         return;
@@ -46,17 +46,16 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         updateProductAmount({productId: productId, amount: 1});
       } else { 
         await api.get(`/products/${productId}`).then((productData) => {
+          const newCart = [...cart];
           const newProduct = {
             ...productData.data,
-            amount: 1,
-          };
-  
-          setCart([
-            ...cart,
-            newProduct
-          ]);
+            amount: 1
+          }
 
-          localStorage.setItem("@RocketShoes:cart", JSON.stringify(cart));
+          newCart.push(newProduct);
+          setCart(newCart);
+
+          localStorage.setItem("@RocketShoes:cart", JSON.stringify(newCart));
         });
       }
     } catch {
@@ -67,6 +66,10 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const removeProduct = (productId: number) => {
     try {
+      if(!cart.find((product) => product.id === productId)) {
+        throw new Error();
+      }
+
       const newCart = cart.filter((product) => product.id !== productId);
       setCart(newCart);
       localStorage.setItem("@RocketShoes:cart", JSON.stringify(newCart));
@@ -85,7 +88,16 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
         await api.get(`/stock/${productId}`).then((stockDataOfProduct) => stockDataOfProduct.data);
 
       const productToUpdate = cart.find((product) => product.id === productId);
-      if(productToUpdate && (productToUpdate.amount + amount > stockOfProduct.amount)) {
+
+      if(!productToUpdate) {
+        throw new Error();
+      }
+
+      if((productToUpdate.amount + amount) <= 0) {
+        throw new Error();
+      }
+
+      if((productToUpdate.amount + amount > stockOfProduct.amount)) {
         toast.error('Quantidade solicitada fora de estoque');
         return;
       }
